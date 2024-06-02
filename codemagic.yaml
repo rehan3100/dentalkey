@@ -1,0 +1,30 @@
+workflows:
+  ios-workflow:
+    name: Build iOS App
+    environment:
+      flutter: stable
+      xcode: latest
+    scripts:
+      - name: Install dependencies
+        script: |
+          flutter packages get
+      - name: Build iOS app
+        script: |
+          flutter build ios --release --no-codesign
+      - name: Create .ipa file
+        script: |
+          xcodebuild -workspace ios/Runner.xcworkspace \
+            -scheme Runner \
+            -sdk iphoneos \
+            -configuration Release \
+            archive -archivePath $HOME/build/Runner.xcarchive
+
+          xcodebuild -exportArchive \
+            -archivePath $HOME/build/Runner.xcarchive \
+            -exportOptionsPlist ios/Runner/ExportOptions.plist \
+            -exportPath $HOME/build/ios
+
+    artifacts:
+      - build/ios/**/*.ipa
+      - build/ios/**/*.app
+      - build/ios/iphoneos/*.app.dSYM.zip
