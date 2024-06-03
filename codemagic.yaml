@@ -4,6 +4,8 @@ workflows:
     environment:
       flutter: stable
       xcode: latest
+      vars:
+        CERTIFICATE_PASSWORD: password123
     scripts:
       - name: Install dependencies
         script: |
