@@ -1,32 +1,31 @@
 workflows:
   ios-workflow:
-    name: Build iOS App
+    name: iOS Workflow
+    instance_type: mac_mini
     environment:
-      flutter: stable
-      xcode: latest
       vars:
-        CERTIFICATE_PASSWORD: password123
+        FLUTTER_VERSION: stable
     scripts:
+      - name: Set up Flutter
+        script: |
+          git clone https://github.com/flutter/flutter.git -b stable
+          export PATH="$PATH:`pwd`/flutter/bin"
       - name: Install dependencies
-        script: |
-          flutter packages get
-      - name: Build iOS app
-        script: |
-          flutter build ios --release --no-codesign
-      - name: Create .ipa file
-        script: |
-          xcodebuild -workspace ios/Runner.xcworkspace \
-            -scheme Runner \
-            -sdk iphoneos \
-            -configuration Release \
-            archive -archivePath $HOME/build/Runner.xcarchive
-
-          xcodebuild -exportArchive \
-            -archivePath $HOME/build/Runner.xcarchive \
-            -exportOptionsPlist ios/Runner/ExportOptions.plist \
-            -exportPath $HOME/build/ios
-
+        script: flutter pub get
+      - name: Build iOS
+        script: flutter build ios --release
     artifacts:
-      - build/ios/**/*.ipa
-      - build/ios/**/*.app
-      - build/ios/iphoneos/*.app.dSYM.zip
+      - build/ios/ipa
+    code_signing:
+      app_store_connect:
+        apple_id: $APPLE_ID
+        password: $APPLE_PASSWORD
+        team_id: $APPLE_TEAM_ID
+        app_identifier: com.dentalkeybydrrehan.dentalkey
+        distribute: false
+    publishing:
+      app_store_connect:
+        apple_id: $APPLE_ID
+        password: $APPLE_PASSWORD
+        app_identifier: com.dentalkeybydrrehan.dentalkey
+        ipa: build/ios/ipa/*.ipa
