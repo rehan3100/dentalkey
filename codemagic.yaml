@@ -41,8 +41,16 @@ workflows:
           security unlock-keychain -p $KEYCHAIN_PASSWORD /Users/builder/Library/codemagic-cli-tools/keychains/build.keychain
           security set-keychain-settings -lut 21600 /Users/builder/Library/codemagic-cli-tools/keychains/build.keychain
 
+          echo "Checking if certificate file exists..."
+          if [ -f /Users/builder/Library/MobileDevice/Certificates/tmpkle4ws46.p12 ]; then
+            echo "Certificate file found."
+          else
+            echo "Certificate file not found!"
+            exit 1
+          fi
+
           echo "Importing certificates..."
-          security import /Users/builder/Library/MobileDevice/Certificates/tmp8kl6noju.p12 -k /Users/builder/Library/codemagic-cli-tools/keychains/build.keychain -P $CERTIFICATE_PASSWORD -T /usr/bin/codesign || (echo "Failed to import certificate" && exit 1)
+          security import /Users/builder/Library/MobileDevice/Certificates/tmpkle4ws46.p12 -k /Users/builder/Library/codemagic-cli-tools/keychains/build.keychain -P $CERTIFICATE_PASSWORD -T /usr/bin/codesign || (echo "Failed to import certificate" && exit 1)
 
       - name: Build and code sign
         script: |
