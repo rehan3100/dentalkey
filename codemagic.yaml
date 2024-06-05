@@ -6,10 +6,6 @@ workflows:
         KEYCHAIN_PASSWORD: Rehan@734266479
         CERTIFICATE_PASSWORD: Rehan@734266479
     scripts:
-      - name: Debug Environment Variables
-        script: |
-          echo "Keychain Password: $KEYCHAIN_PASSWORD"
-          echo "Certificate Password: $CERTIFICATE_PASSWORD"
       - name: Set up keychain and add certificates
         script: |
           echo "Initializing keychain..."
@@ -20,9 +16,36 @@ workflows:
 
           echo "Importing certificates..."
           security import /Users/builder/Library/MobileDevice/Certificates/tmpflazh9j7.p12 -k /Users/builder/Library/codemagic-cli-tools/keychains/build.keychain -P $CERTIFICATE_PASSWORD -T /usr/bin/codesign
+
       - name: Build and code sign
         script: |
+          echo "Building and signing the iOS app..."
           # Build the iOS app
           flutter build ios --release --no-codesign
+
+          # Navigate to the iOS project directory
+          cd ios
+
+          # Archive the app
+          xcodebuild archive \
+            -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -archivePath $HOME/build/Runner.xcarchive \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="iPhone Distribution: 57MY2GPC32" \
+            PROVISIONING_PROFILE_SPECIFIER="DentalKeyDistribute"
+
+          # Export the archive to an IPA
+          xcodebuild -exportArchive \
+            -archivePath $HOME/build/Runner.xcarchive \
+            -exportPath $HOME/build \
+            -exportOptionsPlist ExportOptions.plist
+
+      - name: Build artifact
+        script: |
+          # Move the generated IPA file to the artifacts directory
+          mv $HOME/build/Runner.ipa $HOME/build/ios/Runner.ipa
+
     artifacts:
-      - build/ios/iphoneos/Runner.app
+      - build/ios/Runner.ipa
