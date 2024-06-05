@@ -3,8 +3,8 @@ workflows:
     name: iOS Workflow
     environment:
       vars:
-        KEYCHAIN_PASSWORD: MyKeychainPassword
-        CERTIFICATE_PASSWORD: Encrypted_value_of_your_certificate_password
+        KEYCHAIN_PASSWORD: Rehan@734266479
+        CERTIFICATE_PASSWORD: Rehan@734266479
     scripts:
       - name: Set up keychain and add certificates
         script: |
@@ -15,7 +15,7 @@ workflows:
           security set-keychain-settings -lut 21600 /Users/builder/Library/codemagic-cli-tools/keychains/build.keychain
 
           # Add certificates to keychain
-          security import /Users/builder/Library/MobileDevice/Certificates/tmpiuokects.p12 -k /Users/builder/Library/codemagic-cli-tools/keychains/build.keychain -P $CERTIFICATE_PASSWORD -T /usr/bin/codesign
+          security import /Users/builder/Library/MobileDevice/Certificates/tmpmb1sjbir.p12 -k /Users/builder/Library/codemagic-cli-tools/keychains/build.keychain -P $CERTIFICATE_PASSWORD -T /usr/bin/codesign
       - name: Build and code sign
         script: |
           # Build the iOS app
