@@ -1,27 +1,4 @@
 workflows:
-  android-workflow:
-    name: Android Workflow
-    environment:
-      flutter: stable
-      vars:
-        ANDROID_KEYSTORE: Encrypted(your_encrypted_keystore)
-        ANDROID_KEYSTORE_PASSWORD: Encrypted(your_encrypted_keystore_password)
-        ANDROID_KEY_ALIAS: Encrypted(your_encrypted_key_alias)
-        ANDROID_KEY_PASSWORD: Encrypted(your_encrypted_key_password)
-    scripts:
-      - name: Print environment variables
-        script: |
-          echo "ANDROID_KEYSTORE: ${#ANDROID_KEYSTORE}"
-          echo "ANDROID_KEYSTORE_PASSWORD: ${#ANDROID_KEYSTORE_PASSWORD}"
-          echo "ANDROID_KEY_ALIAS: ${#ANDROID_KEY_ALIAS}"
-          echo "ANDROID_KEY_PASSWORD: ${#ANDROID_KEY_PASSWORD}"
-      - name: Build Android app bundle
-        script: |
-          echo "Building Android app bundle..."
-          flutter build appbundle --release --flavor android-production -t lib/main_prod.dart
-    artifacts:
-      - build/app/outputs/bundle/release/app-release.aab
-
   ios-workflow:
     name: iOS Workflow
     environment:
@@ -31,8 +8,9 @@ workflows:
     scripts:
       - name: Print environment variables
         script: |
-          echo "KEYCHAIN_PASSWORD: ${#KEYCHAIN_PASSWORD}"
-          echo "CERTIFICATE_PASSWORD: ${#CERTIFICATE_PASSWORD}"
+          echo "KEYCHAIN_PASSWORD length: ${#KEYCHAIN_PASSWORD}"
+          echo "CERTIFICATE_PASSWORD length: ${#CERTIFICATE_PASSWORD}"
+
       - name: Set up keychain and add certificates
         script: |
           echo "Initializing keychain..."
@@ -42,15 +20,20 @@ workflows:
           security set-keychain-settings -lut 21600 /Users/builder/Library/codemagic-cli-tools/keychains/build.keychain
 
           echo "Checking if certificate file exists..."
-          if [ -f /Users/builder/Library/MobileDevice/Certificates/tmpkle4ws46.p12 ]; then
+          if [ -f /Users/builder/Library/MobileDevice/Certificates/tmprf1xg30u.p12 ]; then
             echo "Certificate file found."
           else
             echo "Certificate file not found!"
             exit 1
           fi
 
-          echo "Importing certificates..."
-          security import /Users/builder/Library/MobileDevice/Certificates/tmpkle4ws46.p12 -k /Users/builder/Library/codemagic-cli-tools/keychains/build.keychain -P $CERTIFICATE_PASSWORD -T /usr/bin/codesign || (echo "Failed to import certificate" && exit 1)
+          echo "Importing certificates with password..."
+          security import /Users/builder/Library/MobileDevice/Certificates/tmprf1xg30u.p12 -k /Users/builder/Library/codemagic-cli-tools/keychains/build.keychain -P $CERTIFICATE_PASSWORD -T /usr/bin/codesign
+
+          if [ $? -ne 0 ]; then
+            echo "Failed to import certificate"
+            exit 1
+          fi
 
       - name: Build and code sign
         script: |
@@ -80,17 +63,3 @@ workflows:
 
     artifacts:
       - build/ios/Runner.ipa
-
-  web-workflow:
-    name: Web Workflow
-    environment:
-      flutter: stable
-    scripts:
-      - name: Set up build
-        script: |
-          echo "Starting Web build..."
-      - name: Build Web app
-        script: |
-          flutter build web --release
-    artifacts:
-      - build/web
