@@ -1,4 +1,27 @@
 workflows:
+  android-workflow:
+    name: Android Workflow
+    environment:
+      flutter: stable
+      vars:
+        ANDROID_KEYSTORE: Encrypted(your_encrypted_keystore)
+        ANDROID_KEYSTORE_PASSWORD: Encrypted(your_encrypted_keystore_password)
+        ANDROID_KEY_ALIAS: Encrypted(your_encrypted_key_alias)
+        ANDROID_KEY_PASSWORD: Encrypted(your_encrypted_key_password)
+    scripts:
+      - name: Print environment variables
+        script: |
+          echo "ANDROID_KEYSTORE: ${#ANDROID_KEYSTORE}"
+          echo "ANDROID_KEYSTORE_PASSWORD: ${#ANDROID_KEYSTORE_PASSWORD}"
+          echo "ANDROID_KEY_ALIAS: ${#ANDROID_KEY_ALIAS}"
+          echo "ANDROID_KEY_PASSWORD: ${#ANDROID_KEY_PASSWORD}"
+      - name: Build Android app bundle
+        script: |
+          echo "Building Android app bundle..."
+          flutter build appbundle --release --flavor android-production -t lib/main_prod.dart
+    artifacts:
+      - build/app/outputs/bundle/release/app-release.aab
+
   ios-workflow:
     name: iOS Workflow
     environment:
@@ -6,10 +29,10 @@ workflows:
         KEYCHAIN_PASSWORD: Rehan@734266479
         CERTIFICATE_PASSWORD: Rehan@734266479
     scripts:
-      - name: Debug Environment Variables
+      - name: Print environment variables
         script: |
-          echo "Keychain Password Length: ${#KEYCHAIN_PASSWORD}"
-          echo "Certificate Password Length: ${#CERTIFICATE_PASSWORD}"
+          echo "KEYCHAIN_PASSWORD: ${#KEYCHAIN_PASSWORD}"
+          echo "CERTIFICATE_PASSWORD: ${#CERTIFICATE_PASSWORD}"
       - name: Set up keychain and add certificates
         script: |
           echo "Initializing keychain..."
@@ -24,15 +47,11 @@ workflows:
       - name: Build and code sign
         script: |
           echo "Building and signing the iOS app..."
-          # Build the iOS app
-          flutter build ios --release --no-codesign
+          flutter build ios --release --flavor ios-production -t lib/main_prod.dart
 
-          # Navigate to the iOS project directory
-          cd ios
-
-          # Archive the app
+          echo "Archiving the app..."
           xcodebuild archive \
-            -workspace Runner.xcworkspace \
+            -workspace ios/Runner.xcworkspace \
             -scheme Runner \
             -configuration Release \
             -archivePath $HOME/build/Runner.xcarchive \
@@ -40,16 +59,30 @@ workflows:
             CODE_SIGN_IDENTITY="iPhone Distribution: 57MY2GPC32" \
             PROVISIONING_PROFILE_SPECIFIER="DentalKeyDistribute"
 
-          # Export the archive to an IPA
+          echo "Exporting the archive to an IPA..."
           xcodebuild -exportArchive \
             -archivePath $HOME/build/Runner.xcarchive \
             -exportPath $HOME/build \
-            -exportOptionsPlist ExportOptions.plist
+            -exportOptionsPlist ios/ExportOptions.plist
 
       - name: Build artifact
         script: |
-          # Move the generated IPA file to the artifacts directory
+          echo "Moving the generated IPA file..."
           mv $HOME/build/Runner.ipa $HOME/build/ios/Runner.ipa
 
     artifacts:
       - build/ios/Runner.ipa
+
+  web-workflow:
+    name: Web Workflow
+    environment:
+      flutter: stable
+    scripts:
+      - name: Set up build
+        script: |
+          echo "Starting Web build..."
+      - name: Build Web app
+        script: |
+          flutter build web --release
+    artifacts:
+      - build/web
