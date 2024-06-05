@@ -6,6 +6,10 @@ workflows:
         KEYCHAIN_PASSWORD: Rehan@734266479
         CERTIFICATE_PASSWORD: Rehan@734266479
     scripts:
+      - name: Debug Environment Variables
+        script: |
+          echo "Keychain Password Length: ${#KEYCHAIN_PASSWORD}"
+          echo "Certificate Password Length: ${#CERTIFICATE_PASSWORD}"
       - name: Set up keychain and add certificates
         script: |
           echo "Initializing keychain..."
@@ -15,7 +19,7 @@ workflows:
           security set-keychain-settings -lut 21600 /Users/builder/Library/codemagic-cli-tools/keychains/build.keychain
 
           echo "Importing certificates..."
-          security import /Users/builder/Library/MobileDevice/Certificates/tmpflazh9j7.p12 -k /Users/builder/Library/codemagic-cli-tools/keychains/build.keychain -P $CERTIFICATE_PASSWORD -T /usr/bin/codesign
+          security import /Users/builder/Library/MobileDevice/Certificates/tmp8kl6noju.p12 -k /Users/builder/Library/codemagic-cli-tools/keychains/build.keychain -P $CERTIFICATE_PASSWORD -T /usr/bin/codesign || (echo "Failed to import certificate" && exit 1)
 
       - name: Build and code sign
         script: |
