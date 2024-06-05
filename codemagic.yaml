@@ -14,13 +14,13 @@ workflows:
       - name: Set up keychain and add certificates
         script: |
           echo "Initializing keychain..."
-          security create-keychain -p $KEYCHAIN_PASSWORD /Users/builder/Library/codemagic-cli-tools/keychains/build.keychain
+          security create-keychain -p "$KEYCHAIN_PASSWORD" /Users/builder/Library/codemagic-cli-tools/keychains/build.keychain
           security default-keychain -s /Users/builder/Library/codemagic-cli-tools/keychains/build.keychain
-          security unlock-keychain -p $KEYCHAIN_PASSWORD /Users/builder/Library/codemagic-cli-tools/keychains/build.keychain
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" /Users/builder/Library/codemagic-cli-tools/keychains/build.keychain
           security set-keychain-settings -lut 21600 /Users/builder/Library/codemagic-cli-tools/keychains/build.keychain
 
           echo "Checking if certificate file exists..."
-          if [ -f /Users/builder/Library/MobileDevice/Certificates/tmprf1xg30u.p12 ]; then
+          if [ -f /Users/builder/Library/MobileDevice/Certificates/tmpfj6e_3nz.p12 ]; then
             echo "Certificate file found."
           else
             echo "Certificate file not found!"
@@ -28,7 +28,7 @@ workflows:
           fi
 
           echo "Importing certificates with password..."
-          security import /Users/builder/Library/MobileDevice/Certificates/tmprf1xg30u.p12 -k /Users/builder/Library/codemagic-cli-tools/keychains/build.keychain -P $CERTIFICATE_PASSWORD -T /usr/bin/codesign
+          security import /Users/builder/Library/MobileDevice/Certificates/tmpfj6e_3nz.p12 -k /Users/builder/Library/codemagic-cli-tools/keychains/build.keychain -P "$CERTIFICATE_PASSWORD" -T /usr/bin/codesign
 
           if [ $? -ne 0 ]; then
             echo "Failed to import certificate"
