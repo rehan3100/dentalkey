@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 
 class ScreenshotRestriction {
-  static const MethodChannel _channel = MethodChannel('com.dentalkeybyrehan/screenshot');
+  static const MethodChannel _channel = MethodChannel('com.dentalkeybyrehan.dentalkey/screenshot');
 
   static Future<void> enableScreenshotRestriction() async {
     try {
