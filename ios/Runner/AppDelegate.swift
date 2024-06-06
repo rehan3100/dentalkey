@@ -3,54 +3,51 @@ import Flutter
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
-  var window: UIWindow?
-
+  var restrictScreenshotViewController: UIViewController?
+  
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     GeneratedPluginRegistrant.register(with: self)
     
-    let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
-    let secureChannel = FlutterMethodChannel(name: "com.dentalkeybyrehan.secure",
-                                              binaryMessenger: controller.binaryMessenger)
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(appWillResignActive),
+      name: UIApplication.willResignActiveNotification,
+      object: nil)
     
-    secureChannel.setMethodCallHandler { [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) in
-      guard let self = self else { return }
-      switch call.method {
-      case "enableSecureScreen":
-        self.enableSecureScreen()
-        result(nil)
-      case "disableSecureScreen":
-        self.disableSecureScreen()
-        result(nil)
-      default:
-        result(FlutterMethodNotImplemented)
-      }
-    }
-
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(appDidBecomeActive),
+      name: UIApplication.didBecomeActiveNotification,
+      object: nil)
+    
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
-
-  private func enableSecureScreen() {
-    if let window = self.window {
-        let field = UITextField()
-        field.isSecureTextEntry = true
-        window.addSubview(field)
-        field.centerYAnchor.constraint(equalTo: window.centerYAnchor).isActive = true
-        field.centerXAnchor.constraint(equalTo: window.centerXAnchor).isActive = true
-        window.layer.superlayer?.addSublayer(field.layer)
-        field.layer.sublayers?.first?.addSublayer(window.layer)
+  
+  @objc func appWillResignActive() {
+    if let restrictScreenshotViewController = restrictScreenshotViewController {
+      let window = UIApplication.shared.windows.first { $0.isKeyWindow }
+      window?.addSubview(restrictScreenshotViewController.view)
     }
   }
-
-  private func disableSecureScreen() {
-    if let window = self.window {
-        for view in window.subviews {
-            if view is UITextField && (view as! UITextField).isSecureTextEntry {
-                view.removeFromSuperview()
-            }
-        }
+  
+  @objc func appDidBecomeActive() {
+    if let restrictScreenshotViewController = restrictScreenshotViewController {
+      restrictScreenshotViewController.view.removeFromSuperview()
     }
+  }
+}
+
+extension UIWindow {
+  func secureApp() {
+    let field = UITextField()
+    field.isSecureTextEntry = true
+    self.addSubview(field)
+    field.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
+    field.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
+    self.layer.superlayer?.addSublayer(field.layer)
+    field.layer.sublayers?.first?.addSublayer(self.layer)
   }
 }

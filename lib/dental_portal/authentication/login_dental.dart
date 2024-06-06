@@ -10,8 +10,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'dart:io';
+import 'dart:io' show Platform;
 import 'package:flutter_windowmanager/flutter_windowmanager.dart';
-import 'secure_overlay.dart';
+import 'screenshot_restriction.dart';
 
 class LoginDental extends StatefulWidget {
   @override
@@ -32,20 +33,13 @@ class _LoginDentalState extends State<LoginDental> {
   }
 
   Future<void> _enableScreenshotRestriction() async {
-    await SecureOverlay.enableSecureScreen();
-  }
-
-  Future<void> _disableScreenshotRestriction() async {
-    await SecureOverlay.disableSecureScreen();
-  }
-
-
-  
-  Future<void> _enableScreenshotRestriction() async {
     if (Platform.isAndroid) {
       await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
+    } else if (Platform.isIOS) {
+      await ScreenshotRestriction.enableScreenshotRestriction();
     }
   }
+
 
   @override
   void dispose() {
@@ -57,6 +51,8 @@ class _LoginDentalState extends State<LoginDental> {
   Future<void> _disableScreenshotRestriction() async {
     if (Platform.isAndroid) {
       await FlutterWindowManager.clearFlags(FlutterWindowManager.FLAG_SECURE);
+    } else if (Platform.isIOS) {
+      await ScreenshotRestriction.disableScreenshotRestriction();
     }
   }
 

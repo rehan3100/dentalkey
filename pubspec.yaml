@@ -2,7 +2,7 @@ name: dental_key
 description: "A new Flutter project."
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.0.1+2
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
@@ -49,7 +49,7 @@ dependencies:
   device_info_plus: ^9.1.2
   permission_handler: ^11.3.1
   json_annotation: ^4.0.1
-  android_id: ^0.3.6
+  android_id: ^0.4.0
   device_imei: ^0.0.4+2
   currency_picker: ^2.0.4
   local_auth: ^2.1.3
