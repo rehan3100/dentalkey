@@ -11,3 +11,4 @@ class ScreenshotRestriction {
     await _channel.invokeMethod('disableScreenshotRestriction');
   }
 }
+
