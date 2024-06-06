@@ -32,6 +32,16 @@ class _LoginDentalState extends State<LoginDental> {
   }
 
   Future<void> _enableScreenshotRestriction() async {
+    await SecureOverlay.enableSecureScreen();
+  }
+
+  Future<void> _disableScreenshotRestriction() async {
+    await SecureOverlay.disableSecureScreen();
+  }
+
+
+  
+  Future<void> _enableScreenshotRestriction() async {
     if (Platform.isAndroid) {
       await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
     }
