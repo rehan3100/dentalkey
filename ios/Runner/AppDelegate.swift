@@ -3,7 +3,7 @@ import Flutter
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
-  var secureTextField: UITextField?
+  var field: UITextField!
 
   override func application(
     _ application: UIApplication,
@@ -19,36 +19,65 @@ import Flutter
       switch call.method {
       case "enableScreenshotRestriction":
         self.enableScreenshotRestriction()
+        print("enableScreenshotRestriction called")
         result(nil)
       case "disableScreenshotRestriction":
         self.disableScreenshotRestriction()
+        print("disableScreenshotRestriction called")
         result(nil)
       default:
         result(FlutterMethodNotImplemented)
       }
     }
+    
+    self.addSecureView()
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
-  private func enableScreenshotRestriction() {
-    guard secureTextField == nil else { return }
+  override func applicationWillResignActive(_ application: UIApplication) {
+    field?.isSecureTextEntry = false
+  }
 
-    let field = UITextField()
+  override func applicationDidBecomeActive(_ application: UIApplication) {
+    field?.isSecureTextEntry = true
+  }
+
+  private func addSecureView() {
+    field = UITextField()
     field.translatesAutoresizingMaskIntoConstraints = false
     field.isSecureTextEntry = true
     if let window = UIApplication.shared.windows.first {
-      window.addSubview(field)
-      field.centerYAnchor.constraint(equalTo: window.centerYAnchor).isActive = true
-      field.centerXAnchor.constraint(equalTo: window.centerXAnchor).isActive = true
-      secureTextField = field
-      print("Secure UITextField added to UIWindow")
+      if !window.subviews.contains(field) {
+        window.addSubview(field)
+        field.centerYAnchor.constraint(equalTo: window.centerYAnchor).isActive = true
+        field.centerXAnchor.constraint(equalTo: window.centerXAnchor).isActive = true
+        window.layer.superlayer?.addSublayer(field.layer)
+        if #available(iOS 17.0, *) {
+          field.layer.sublayers?.last?.addSublayer(window.layer)
+        } else {
+          field.layer.sublayers?.first?.addSublayer(window.layer)
+        }
+        print("Secure UITextField added to UIWindow")
+      }
+    }
+  }
+
+  private func enableScreenshotRestriction() {
+    if let window = UIApplication.shared.windows.first {
+      addSecureView()
+      print("Secure app enabled")
     }
   }
 
   private func disableScreenshotRestriction() {
-    secureTextField?.removeFromSuperview()
-    secureTextField = nil
-    print("Secure UITextField removed from UIWindow")
+    if let window = UIApplication.shared.windows.first {
+      for subview in window.subviews {
+        if subview is UITextField && (subview as! UITextField).isSecureTextEntry {
+          subview.removeFromSuperview()
+          print("Secure app disabled")
+        }
+      }
+    }
   }
 }

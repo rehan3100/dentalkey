@@ -13,6 +13,9 @@ import 'dart:io';
 import 'dart:io' show Platform;
 import 'package:flutter_windowmanager/flutter_windowmanager.dart';
 import 'screenshot_restriction.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:uuid/uuid.dart';
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 
 class LoginDental extends StatefulWidget {
   @override
@@ -68,12 +71,9 @@ class _LoginDentalState extends State<LoginDental> {
         androidId = await platform.invokeMethod('getAndroidId');
         advertisingId = await platform.invokeMethod('getAdvertisingId');
       } else if (Platform.isIOS) {
-        DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-        IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-        androidId = iosInfo.identifierForVendor;
-        // You can get IDFV or IDFA for iOS
+        androidId = await getKeychainIdentifier();
         advertisingId =
-            iosInfo.identifierForVendor; // Alternatively use a package for IDFA
+            await requestTrackingPermission(); 
       }
     } on PlatformException catch (e) {
       print('Failed to get device identifiers: ${e.message}');
@@ -84,6 +84,36 @@ class _LoginDentalState extends State<LoginDental> {
       'advertisingId': advertisingId,
     };
   }
+
+  final storage = FlutterSecureStorage();
+  final uuid = Uuid();
+
+  Future<String> getKeychainIdentifier() async {
+    // Access keychain with shared app group
+    final sharedStorage = FlutterSecureStorage(aOptions: IOSOptions(accessGroup: 'group.com.yourcompany.yourapp'));
+
+    // Check if the identifier already exists in the shared keychain
+    String? deviceIdentifier = await sharedStorage.read(key: 'device_identifier');
+    
+    if (deviceIdentifier == null) {
+      // If not, generate a new UUID and store it in the shared keychain
+      deviceIdentifier = uuid.v4();
+      await sharedStorage.write(key: 'device_identifier', value: deviceIdentifier);
+    }
+
+    return deviceIdentifier;
+  }
+
+  Future<String?> requestTrackingPermission() async {
+    final status = await AppTrackingTransparency.requestTrackingAuthorization();
+    if (status == TrackingStatus.authorized) {
+      // Use the advertising_id package to get IDFA
+      return await AdvertisingId.idfa;
+    }
+    return null;
+  }
+
+
 
   Future<void> _handleLogin() async {
     String email = _emailController.text;
