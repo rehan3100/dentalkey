@@ -3,7 +3,7 @@ import Flutter
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
-  var secureView: UIView?
+  var secureTextField: UITextField?
 
   override func application(
     _ application: UIApplication,
@@ -31,31 +31,24 @@ import Flutter
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
-  override func applicationWillResignActive(_ application: UIApplication) {
-    // No need to modify secureTextEntry property of UITextField here
-  }
-
-  override func applicationDidBecomeActive(_ application: UIApplication) {
-    // No need to modify secureTextEntry property of UITextField here
-  }
-
   private func enableScreenshotRestriction() {
+    guard secureTextField == nil else { return }
+
+    let field = UITextField()
+    field.translatesAutoresizingMaskIntoConstraints = false
+    field.isSecureTextEntry = true
     if let window = UIApplication.shared.windows.first {
-      if secureView == nil {
-        secureView = UIView(frame: window.bounds)
-        secureView!.backgroundColor = UIColor.black
-        secureView!.isUserInteractionEnabled = false
-        window.addSubview(secureView!)
-        print("Secure UIView added to UIWindow")
-      }
+      window.addSubview(field)
+      field.centerYAnchor.constraint(equalTo: window.centerYAnchor).isActive = true
+      field.centerXAnchor.constraint(equalTo: window.centerXAnchor).isActive = true
+      secureTextField = field
+      print("Secure UITextField added to UIWindow")
     }
   }
 
   private func disableScreenshotRestriction() {
-    if let window = UIApplication.shared.windows.first {
-      secureView?.removeFromSuperview()
-      secureView = nil
-      print("Secure UIView removed from UIWindow")
-    }
+    secureTextField?.removeFromSuperview()
+    secureTextField = nil
+    print("Secure UITextField removed from UIWindow")
   }
 }

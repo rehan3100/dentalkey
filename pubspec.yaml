@@ -56,6 +56,7 @@ dependencies:
   flutter_secure_storage: ^9.2.2
   mailto: ^2.0.0
   logging: ^1.0.2
+  app_tracking_transparency: ^2.0.1
 
 dev_dependencies:
   flutter_test:
