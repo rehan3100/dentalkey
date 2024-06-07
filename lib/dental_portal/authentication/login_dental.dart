@@ -12,7 +12,6 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'dart:io';
 import 'dart:io' show Platform;
 import 'package:flutter_windowmanager/flutter_windowmanager.dart';
-import 'screenshot_restriction.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:uuid/uuid.dart';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
@@ -30,6 +29,8 @@ class _LoginDentalState extends State<LoginDental> {
   bool _isLoading = false;
   bool _passwordVisible = false;
 
+  static const screenshotplatform = MethodChannel('com.dentalkeybyrehan.dentalkey/screenshot');
+
   @override
   void initState() {
     super.initState();
@@ -40,7 +41,7 @@ class _LoginDentalState extends State<LoginDental> {
     if (Platform.isAndroid) {
       await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
     } else if (Platform.isIOS) {
-      await ScreenshotRestriction.enableScreenshotRestriction();
+      await screenshotplatform.invokeMethod('enableScreenshotRestriction');
     }
   }
 
@@ -56,7 +57,7 @@ class _LoginDentalState extends State<LoginDental> {
     if (Platform.isAndroid) {
       await FlutterWindowManager.clearFlags(FlutterWindowManager.FLAG_SECURE);
     } else if (Platform.isIOS) {
-      await ScreenshotRestriction.disableScreenshotRestriction();
+      await screenshotplatform.invokeMethod('disableScreenshotRestriction');
     }
   }
 

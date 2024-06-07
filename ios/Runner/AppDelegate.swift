@@ -58,7 +58,6 @@ import Flutter
         } else {
           field.layer.sublayers?.first?.addSublayer(window.layer)
         }
-        print("Secure UITextField added to UIWindow")
       }
     }
   }
@@ -66,7 +65,6 @@ import Flutter
   private func enableScreenshotRestriction() {
     if let window = UIApplication.shared.windows.first {
       addSecureView()
-      print("Secure app enabled")
     }
   }
 
@@ -75,7 +73,6 @@ import Flutter
       for subview in window.subviews {
         if subview is UITextField && (subview as! UITextField).isSecureTextEntry {
           subview.removeFromSuperview()
-          print("Secure app disabled")
         }
       }
     }
