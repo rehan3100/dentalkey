@@ -8,9 +8,6 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  double fem = 0;
-  double ffem = 0;
-
   // Booleans to track whether each image is clicked
   bool isDentistPortalClicked = false;
   bool isDentalDoctorClicked = false;
@@ -26,6 +23,8 @@ class _MainScreenState extends State<MainScreen> {
         // Deactivate group 2
         isPatientPortalClicked = false;
         isPatientPatientClicked = false;
+      } else {
+        isDentalDoctorClicked = false;
       }
     });
   }
@@ -39,6 +38,8 @@ class _MainScreenState extends State<MainScreen> {
         // Deactivate group 1
         isDentistPortalClicked = false;
         isDentalDoctorClicked = false;
+      } else {
+        isPatientPatientClicked = false;
       }
     });
   }
@@ -54,8 +55,8 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    fem = MediaQuery.of(context).size.width / 429;
-    ffem = fem * 0.97;
+    double fem = MediaQuery.of(context).size.width / 429;
+    double ffem = fem * 0.97;
 
     return WillPopScope(
       onWillPop: _onWillPop,
@@ -63,13 +64,12 @@ class _MainScreenState extends State<MainScreen> {
         body: SingleChildScrollView(
           child: Container(
             width: double.infinity,
-            child: Container(
+            child: Padding(
               padding: EdgeInsets.fromLTRB(
                   13.94 * fem, // left padding
                   100 * fem, // top padding
                   13.94 * fem, // right padding
                   20 * fem), // bottom padding (adjust as needed)
-              width: double.infinity,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -100,48 +100,60 @@ class _MainScreenState extends State<MainScreen> {
                     child: Stack(
                       children: [
                         Positioned(
-                          left: 70 * fem, // Adjust left position of the first image
+                          left: 70 *
+                              fem, // Adjust left position of the first image
                           top: 0,
                           child: GestureDetector(
                             onTap: handleGroup1Click,
                             child: Image.asset(
-                              'assets/images/dentists_portal_unclicked.png',
+                              isDentistPortalClicked
+                                  ? 'assets/images/dentalportalclicked.png'
+                                  : 'assets/images/dentists_portal_unclicked.png',
                               width: 150 * fem, // Adjust width as needed
                               height: 150 * fem, // Adjust height as needed
                             ),
                           ),
                         ),
                         Positioned(
-                          left: -20 * fem, // Adjust left position of the second image
+                          left: -20 *
+                              fem, // Adjust left position of the second image
                           top: 20,
                           child: GestureDetector(
                             onTap: handleGroup1Click,
                             child: Image.asset(
-                              'assets/images/dentalportaldoctor.png',
+                              isDentalDoctorClicked
+                                  ? 'assets/images/dentalportaldoctorclicked.png'
+                                  : 'assets/images/dentalportaldoctor.png',
                               width: 150 * fem, // Adjust width as needed
                               height: 200 * fem, // Adjust height as needed
                             ),
                           ),
                         ),
                         Positioned(
-                          left: 200 * fem, // Adjust left position of the third image
+                          left: 200 *
+                              fem, // Adjust left position of the third image
                           top: 0,
                           child: GestureDetector(
                             onTap: handleGroup2Click,
                             child: Image.asset(
-                              'assets/images/patient_portal.png',
+                              isPatientPortalClicked
+                                  ? 'assets/images/patientportalclicked.png'
+                                  : 'assets/images/patient_portal.png',
                               width: 150 * fem, // Adjust width as needed
                               height: 150 * fem, // Adjust height as needed
                             ),
                           ),
                         ),
                         Positioned(
-                          left: 280 * fem, // Adjust left position of the fourth image
+                          left: 280 *
+                              fem, // Adjust left position of the fourth image
                           top: 20,
                           child: GestureDetector(
                             onTap: handleGroup2Click,
                             child: Image.asset(
-                              'assets/images/patientportalpatient.png',
+                              isPatientPatientClicked
+                                  ? 'assets/images/patientportalpatientclicked.png'
+                                  : 'assets/images/patientportalpatient.png',
                               width: 150 * fem, // Adjust width as needed
                               height: 200 * fem, // Adjust height as needed
                             ),
@@ -150,6 +162,7 @@ class _MainScreenState extends State<MainScreen> {
                       ],
                     ),
                   ),
+    
                 ],
               ),
             ),
@@ -157,7 +170,7 @@ class _MainScreenState extends State<MainScreen> {
         ),
         bottomNavigationBar: BottomAppBar(
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 10.0 * fem),
+            padding: EdgeInsets.symmetric(vertical: 10.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -175,9 +188,9 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                 if (isPatientPortalClicked && isPatientPatientClicked)
                   ElevatedButton(
-                    onPressed: null, // Disable the button
+                    onPressed: null,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey, // Set the button's background color to grey
+                      backgroundColor: Colors.grey,
                     ),
                     child: Text('Not available for now'),
                   ),

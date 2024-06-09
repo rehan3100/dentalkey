@@ -40,8 +40,8 @@ class _LoginDentalState extends State<LoginDental> {
   Future<void> _enableScreenshotRestriction() async {
     if (Platform.isAndroid) {
       await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
-    } else if (Platform.isIOS) {
-      await screenshotplatform.invokeMethod('enableScreenshotRestriction');
+//    } else if (Platform.isIOS) {
+//      await screenshotplatform.invokeMethod('enableScreenshotRestriction');
     }
   }
 
@@ -56,8 +56,8 @@ class _LoginDentalState extends State<LoginDental> {
   Future<void> _disableScreenshotRestriction() async {
     if (Platform.isAndroid) {
       await FlutterWindowManager.clearFlags(FlutterWindowManager.FLAG_SECURE);
-    } else if (Platform.isIOS) {
-      await screenshotplatform.invokeMethod('disableScreenshotRestriction');
+//    } else if (Platform.isIOS) {
+//      await screenshotplatform.invokeMethod('disableScreenshotRestriction');
     }
   }
 
