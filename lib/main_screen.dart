@@ -100,98 +100,88 @@ class _MainScreenState extends State<MainScreen> {
                     child: Stack(
                       children: [
                         Positioned(
-                          left: 70 *
-                              fem, // Adjust left position of the first image
+                          left: 70 * fem, // Adjust left position of the first image
                           top: 0,
                           child: GestureDetector(
                             onTap: handleGroup1Click,
                             child: Image.asset(
-                              isDentistPortalClicked
-                                  ? 'assets/images/dentalportalclicked.png'
-                                  : 'assets/images/dentists_portal_unclicked.png',
+                              'assets/images/dentists_portal_unclicked.png',
                               width: 150 * fem, // Adjust width as needed
                               height: 150 * fem, // Adjust height as needed
                             ),
                           ),
                         ),
                         Positioned(
-                          left: -20 *
-                              fem, // Adjust left position of the second image
+                          left: -20 * fem, // Adjust left position of the second image
                           top: 20,
                           child: GestureDetector(
                             onTap: handleGroup1Click,
                             child: Image.asset(
-                              isDentalDoctorClicked
-                                  ? 'assets/images/dentalportaldoctorclicked.png'
-                                  : 'assets/images/dentalportaldoctor.png',
+                              'assets/images/dentalportaldoctor.png',
                               width: 150 * fem, // Adjust width as needed
                               height: 200 * fem, // Adjust height as needed
                             ),
                           ),
                         ),
                         Positioned(
-                          left: 200 *
-                              fem, // Adjust left position of the third image
+                          left: 200 * fem, // Adjust left position of the third image
                           top: 0,
                           child: GestureDetector(
                             onTap: handleGroup2Click,
                             child: Image.asset(
-                              isPatientPortalClicked
-                                  ? 'assets/images/patientportalclicked.png'
-                                  : 'assets/images/patient_portal.png',
+                              'assets/images/patient_portal.png',
                               width: 150 * fem, // Adjust width as needed
                               height: 150 * fem, // Adjust height as needed
                             ),
                           ),
                         ),
                         Positioned(
-                          left: 280 *
-                              fem, // Adjust left position of the fourth image
+                          left: 280 * fem, // Adjust left position of the fourth image
                           top: 20,
                           child: GestureDetector(
                             onTap: handleGroup2Click,
                             child: Image.asset(
-                              isPatientPatientClicked
-                                  ? 'assets/images/patientportalpatientclicked.png'
-                                  : 'assets/images/patientportalpatient.png',
+                              'assets/images/patientportalpatient.png',
                               width: 150 * fem, // Adjust width as needed
                               height: 200 * fem, // Adjust height as needed
                             ),
                           ),
                         ),
-                        // Show buttons based on selected group
-                        if (isDentistPortalClicked && isDentalDoctorClicked)
-                          Positioned(
-                            left:
-                                120 * fem, // Adjust left position of the button
-                            top: 240 * fem, // Adjust top position of the button
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => LoginDental(),
-                                  ),
-                                );
-                              },
-                              child: Text('Continue to Login'),
-                            ),
-                          ),
-                        if (isPatientPortalClicked && isPatientPatientClicked)
-                          Positioned(
-                            left:
-                                120 * fem, // Adjust left position of the button
-                            top: 240 * fem, // Adjust top position of the button
-                            child: ElevatedButton(
-                              onPressed: () {},
-                              child: Text('Continue to Login'),
-                            ),
-                          ),
                       ],
                     ),
                   ),
                 ],
               ),
+            ),
+          ),
+        ),
+        bottomNavigationBar: BottomAppBar(
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 10.0 * fem),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (isDentistPortalClicked && isDentalDoctorClicked)
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LoginDental(),
+                        ),
+                      );
+                    },
+                    child: Text('Continue to Login'),
+                  ),
+                if (isPatientPortalClicked && isPatientPatientClicked)
+                  ElevatedButton(
+                    onPressed: null, // Disable the button
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey, // Set the button's background color to grey
+                    ),
+                    child: Text('Not available for now'),
+                  ),
+              ],
             ),
           ),
         ),
