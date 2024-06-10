@@ -14,7 +14,7 @@ void main() async {
   if (Platform.isAndroid) {
     await FlutterDownloader.initialize(
       debug:
-          false, // optional: set to false to disable printing logs to console
+          false, 
     );
   }
   await _checkPermissions();
@@ -57,6 +57,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Dental Key',
+      debugShowCheckedModeBanner: false,  // Add this line to remove the debug banner
       theme: ThemeData(
         primaryColor: const Color(0xFF385A92),
         colorScheme: ColorScheme.fromSwatch()
@@ -314,3 +315,4 @@ class _LoadingButtonState extends State<LoadingButton> {
     }
   }
 }
+
