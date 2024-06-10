@@ -315,4 +315,3 @@ class _LoadingButtonState extends State<LoadingButton> {
     }
   }
 }
-
