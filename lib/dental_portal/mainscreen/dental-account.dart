@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:dental_key/delete_account.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:dental_key/dental_portal/authentication/dental_device_change.dart';
 import 'package:dental_key/dental_portal/authentication/login_dental.dart';
@@ -729,6 +730,18 @@ class _DentalAccountState extends State<DentalAccount> {
                                 },
                                 icon: Icon(Icons.phone_android, size: 24.0),
                                 label: Text('Request Change in Device',
+                                    style: TextStyle(fontSize: 18.0)),
+                              ),
+                              ElevatedButton.icon(
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              AccountDeletionPage()));
+                                },
+                                icon: Icon(Icons.delete_forever, size: 24.0),
+                                label: Text('Request Account Deletion',
                                     style: TextStyle(fontSize: 18.0)),
                               ),
                               ElevatedButton.icon(

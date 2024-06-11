@@ -40,11 +40,10 @@ class _LoginDentalState extends State<LoginDental> {
   Future<void> _enableScreenshotRestriction() async {
     if (Platform.isAndroid) {
       await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
-//    } else if (Platform.isIOS) {
-//      await screenshotplatform.invokeMethod('enableScreenshotRestriction');
+    // } else if (Platform.isIOS) {
+    //   await screenshotplatform.invokeMethod('enableScreenshotRestriction');
     }
   }
-
 
   @override
   void dispose() {
@@ -56,13 +55,12 @@ class _LoginDentalState extends State<LoginDental> {
   Future<void> _disableScreenshotRestriction() async {
     if (Platform.isAndroid) {
       await FlutterWindowManager.clearFlags(FlutterWindowManager.FLAG_SECURE);
-//    } else if (Platform.isIOS) {
-//      await screenshotplatform.invokeMethod('disableScreenshotRestriction');
+    // } else if (Platform.isIOS) {
+    //   await screenshotplatform.invokeMethod('disableScreenshotRestriction');
     }
   }
 
-  static const platform =
-      MethodChannel('com.dentalkeybyrehan.dentalkeynew/device_id');
+  static const platform = MethodChannel('com.dentalkeybyrehan.dentalkeynew/device_id');
 
   Future<Map<String, String?>> _getDeviceIdentifiers() async {
     String? androidId;
@@ -74,8 +72,7 @@ class _LoginDentalState extends State<LoginDental> {
         advertisingId = await platform.invokeMethod('getAdvertisingId');
       } else if (Platform.isIOS) {
         androidId = await getKeychainIdentifier();
-        advertisingId =
-            await AdvertisingId.id(true);
+        advertisingId = await AdvertisingId.id(true);
       }
     } on PlatformException catch (e) {
       print('Failed to get device identifiers: ${e.message}');
@@ -87,11 +84,13 @@ class _LoginDentalState extends State<LoginDental> {
     };
   }
 
-  Future<void> requestTrackingPermission() async {
+  Future<bool> requestTrackingPermission() async {
     final status = await AppTrackingTransparency.requestTrackingAuthorization();
     if (status != TrackingStatus.authorized) {
       print('Tracking permission denied');
+      return false;
     }
+    return true;
   }
 
   final storage = FlutterSecureStorage();
@@ -110,8 +109,6 @@ class _LoginDentalState extends State<LoginDental> {
     return deviceIdentifier;
   }
 
-
-
   Future<void> _handleLogin() async {
     String email = _emailController.text;
     String password = _passwordController.text;
@@ -121,6 +118,32 @@ class _LoginDentalState extends State<LoginDental> {
     });
 
     try {
+      // Request tracking permission for iOS
+      if (Platform.isIOS) {
+        bool permissionGranted = await requestTrackingPermission();
+        if (!permissionGranted) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('Permission Required'),
+              content: Text('Tracking permission is required to use this app. Please enable it in settings.'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            ),
+          );
+          setState(() {
+            _isLoading = false;
+          });
+          return; // Exit the method if permission is not granted
+        }
+      }
+
       Map<String, String?> deviceIdentifiers = await _getDeviceIdentifiers();
       String? deviceIdentifier = deviceIdentifiers['androidId'];
       String? advertisingId = deviceIdentifiers['advertisingId'];
