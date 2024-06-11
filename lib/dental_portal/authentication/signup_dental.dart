@@ -445,254 +445,356 @@ class _DentalSignupState extends State<DentalSignup> {
                                   },
                                 ),
                                 SizedBox(height: 20),
-                                DropdownButtonFormField<String>(
-                                  value: _selectedGender,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _selectedGender = value!;
-                                    });
-                                  },
-                                  items: ['Male', 'Female', 'Other']
-                                      .map<DropdownMenuItem<String>>(
-                                          (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                  }).toList(),
-                                  decoration: InputDecoration(
-                                    labelText: 'Gender',
-                                    labelStyle:
-                                        TextStyle(color: Color(0xff385a92)),
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12.0),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12.0),
-                                      borderSide: BorderSide(
-                                        color: Color(0xff385a92),
-                                        width: 2.0,
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: DropdownButtonFormField<String>(
+                                        value: _selectedGender,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _selectedGender = value!;
+                                          });
+                                        },
+                                        items: ['Male', 'Female', 'Other']
+                                            .map<DropdownMenuItem<String>>(
+                                                (String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
+                                        decoration: InputDecoration(
+                                          labelText: 'Gender',
+                                          labelStyle:
+                                              TextStyle(color: Color(0xff385a92)),
+                                          filled: true,
+                                          fillColor: Colors.white,
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12.0),
+                                            borderSide: BorderSide.none,
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12.0),
+                                            borderSide: BorderSide(
+                                              color: Color(0xff385a92),
+                                              width: 2.0,
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                  ),
+                                    IconButton(
+                                      icon: Icon(Icons.help_outline,
+                                          color: Color(0xff385a92)),
+                                      onPressed: () {
+                                        _showInfoDialog('Gender',
+                                            'Please select your gender.');
+                                      },
+                                    ),
+                                  ],
                                 ),
                                 SizedBox(height: 20),
-                                DropdownButtonFormField<String>(
-                                  value: _selectedCurrentStatus,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _selectedCurrentStatus = value!;
-                                    });
-                                  },
-                                  items: [
-                                    'Undergraduate Dental Student',
-                                    'General Dentist',
-                                    'Postgraduate Dental Student',
-                                    'Specialist Dentist'
-                                  ].map<DropdownMenuItem<String>>(
-                                      (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                  }).toList(),
-                                  decoration: InputDecoration(
-                                    labelText: 'Your Current Status',
-                                    labelStyle:
-                                        TextStyle(color: Color(0xff385a92)),
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12.0),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12.0),
-                                      borderSide: BorderSide(
-                                        color: Color(0xff385a92),
-                                        width: 2.0,
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: DropdownButtonFormField<String>(
+                                        value: _selectedCurrentStatus,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _selectedCurrentStatus = value!;
+                                          });
+                                        },
+                                        items: [
+                                          'Undergraduate Dental Student',
+                                          'General Dentist',
+                                          'Postgraduate Dental Student',
+                                          'Specialist Dentist'
+                                        ].map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
+                                        decoration: InputDecoration(
+                                          labelText: 'Your Current Status',
+                                          labelStyle:
+                                              TextStyle(color: Color(0xff385a92)),
+                                          filled: true,
+                                          fillColor: Colors.white,
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12.0),
+                                            borderSide: BorderSide.none,
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12.0),
+                                            borderSide: BorderSide(
+                                              color: Color(0xff385a92),
+                                              width: 2.0,
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                  ),
+                                    IconButton(
+                                      icon: Icon(Icons.help_outline,
+                                          color: Color(0xff385a92)),
+                                      onPressed: () {
+                                        _showInfoDialog('Current Status',
+                                            'This information is required to get exact information about your current status. You can later change this in your edit profile section of the account page. This will help us identify that you are the right user of the app or not.');
+                                      },
+                                    ),
+                                  ],
                                 ),
                                 SizedBox(height: 20.0),
-                                InternationalPhoneNumberInput(
-                                  onInputChanged: (PhoneNumber? number) {
-                                    setState(() {
-                                      _phoneNumber = number?.phoneNumber ?? '';
-                                      _selectedCountryCode =
-                                          number?.isoCode ?? 'US';
-                                    });
-                                  },
-                                  selectorConfig: SelectorConfig(
-                                    selectorType:
-                                        PhoneInputSelectorType.BOTTOM_SHEET,
-                                  ),
-                                  autoValidateMode:
-                                      AutovalidateMode.onUserInteraction,
-                                  inputDecoration: InputDecoration(
-                                    labelText: 'Phone Number',
-                                    labelStyle: TextStyle(
-                                      color: Color(0xff385a92),
-                                    ),
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12.0),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12.0),
-                                      borderSide: BorderSide(
-                                        color: Color(0xff385a92),
-                                        width: 2.0,
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: InternationalPhoneNumberInput(
+                                        onInputChanged: (PhoneNumber? number) {
+                                          setState(() {
+                                            _phoneNumber = number?.phoneNumber ?? '';
+                                            _selectedCountryCode =
+                                                number?.isoCode ?? 'US';
+                                          });
+                                        },
+                                        selectorConfig: SelectorConfig(
+                                          selectorType:
+                                              PhoneInputSelectorType.BOTTOM_SHEET,
+                                        ),
+                                        autoValidateMode:
+                                            AutovalidateMode.onUserInteraction,
+                                        inputDecoration: InputDecoration(
+                                          labelText: 'Phone Number',
+                                          labelStyle: TextStyle(
+                                            color: Color(0xff385a92),
+                                          ),
+                                          filled: true,
+                                          fillColor: Colors.white,
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12.0),
+                                            borderSide: BorderSide.none,
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12.0),
+                                            borderSide: BorderSide(
+                                              color: Color(0xff385a92),
+                                              width: 2.0,
+                                            ),
+                                          ),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12.0),
+                                            borderSide: BorderSide(
+                                              color: Colors.grey.shade300,
+                                              width: 1.0,
+                                            ),
+                                          ),
+                                          contentPadding: EdgeInsets.symmetric(
+                                              vertical: 15.0, horizontal: 10.0),
+                                          floatingLabelBehavior:
+                                              FloatingLabelBehavior.auto,
+                                        ),
+                                        initialValue: PhoneNumber(
+                                            isoCode: _selectedCountryCode),
                                       ),
                                     ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12.0),
-                                      borderSide: BorderSide(
-                                        color: Colors.grey.shade300,
-                                        width: 1.0,
-                                      ),
+                                    IconButton(
+                                      icon: Icon(Icons.help_outline,
+                                          color: Color(0xff385a92)),
+                                      onPressed: () {
+                                        _showInfoDialog('Phone Number',
+                                            'At least one phone number is required to create your account. In case you are unable to reply on email, we would like to contact you using phone number.');
+                                      },
                                     ),
-                                    contentPadding: EdgeInsets.symmetric(
-                                        vertical: 15.0, horizontal: 10.0),
-                                    floatingLabelBehavior:
-                                        FloatingLabelBehavior.auto,
-                                  ),
-                                  initialValue: PhoneNumber(
-                                      isoCode: _selectedCountryCode),
+                                  ],
                                 ),
                                 SizedBox(height: 20.0),
-                                InternationalPhoneNumberInput(
-                                  onInputChanged: (PhoneNumber? number) {
-                                    setState(() {
-                                      _whatsappNumber =
-                                          number?.phoneNumber ?? '';
-                                      _selected2CountryCode =
-                                          number?.isoCode ?? 'US';
-                                    });
-                                  },
-                                  selectorConfig: SelectorConfig(
-                                    selectorType:
-                                        PhoneInputSelectorType.BOTTOM_SHEET,
-                                  ),
-                                  autoValidateMode:
-                                      AutovalidateMode.onUserInteraction,
-                                  inputDecoration: InputDecoration(
-                                    labelText: 'WhatsApp Number',
-                                    labelStyle: TextStyle(
-                                      color: Color(0xff385a92),
-                                    ),
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12.0),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12.0),
-                                      borderSide: BorderSide(
-                                        color: Color(0xff385a92),
-                                        width: 2.0,
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: InternationalPhoneNumberInput(
+                                        onInputChanged: (PhoneNumber? number) {
+                                          setState(() {
+                                            _whatsappNumber =
+                                                number?.phoneNumber ?? '';
+                                            _selected2CountryCode =
+                                                number?.isoCode ?? 'US';
+                                          });
+                                        },
+                                        selectorConfig: SelectorConfig(
+                                          selectorType:
+                                              PhoneInputSelectorType.BOTTOM_SHEET,
+                                        ),
+                                        autoValidateMode:
+                                            AutovalidateMode.onUserInteraction,
+                                        inputDecoration: InputDecoration(
+                                          labelText: 'WhatsApp Number',
+                                          labelStyle: TextStyle(
+                                            color: Color(0xff385a92),
+                                          ),
+                                          filled: true,
+                                          fillColor: Colors.white,
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12.0),
+                                            borderSide: BorderSide.none,
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12.0),
+                                            borderSide: BorderSide(
+                                              color: Color(0xff385a92),
+                                              width: 2.0,
+                                            ),
+                                          ),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12.0),
+                                            borderSide: BorderSide(
+                                              color: Colors.grey.shade300,
+                                              width: 1.0,
+                                            ),
+                                          ),
+                                          contentPadding: EdgeInsets.symmetric(
+                                              vertical: 15.0, horizontal: 10.0),
+                                          floatingLabelBehavior:
+                                              FloatingLabelBehavior.auto,
+                                        ),
+                                        initialValue: PhoneNumber(
+                                            isoCode: _selected2CountryCode),
                                       ),
                                     ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12.0),
-                                      borderSide: BorderSide(
-                                        color: Colors.grey.shade300,
-                                        width: 1.0,
-                                      ),
+                                    IconButton(
+                                      icon: Icon(Icons.help_outline,
+                                          color: Color(0xff385a92)),
+                                      onPressed: () {
+                                        _showInfoDialog('WhatsApp Number',
+                                            'This is mandatory as part of your verification process that you are really a dental student or dentist. On WhatsApp, you will only be receiving a text message from "+923078623100" or "+447956646619". You will be requested to provide your eligibility documents on either WhatsApp or email to dentalkey.rehan@gmail.com.');
+                                      },
                                     ),
-                                    contentPadding: EdgeInsets.symmetric(
-                                        vertical: 15.0, horizontal: 10.0),
-                                    floatingLabelBehavior:
-                                        FloatingLabelBehavior.auto,
-                                  ),
-                                  initialValue: PhoneNumber(
-                                      isoCode: _selected2CountryCode),
+                                  ],
                                 ),
                                 SizedBox(height: 20.0),
-                                InternationalPhoneNumberInput(
-                                  onInputChanged: (PhoneNumber? number) {
-                                    setState(() {
-                                      _alternativeNumber =
-                                          number?.phoneNumber ?? '';
-                                      _selected3CountryCode =
-                                          number?.isoCode ?? 'US';
-                                    });
-                                  },
-                                  selectorConfig: SelectorConfig(
-                                    selectorType:
-                                        PhoneInputSelectorType.BOTTOM_SHEET,
-                                  ),
-                                  autoValidateMode:
-                                      AutovalidateMode.onUserInteraction,
-                                  inputDecoration: InputDecoration(
-                                    labelText: 'Alternative Contact Number',
-                                    labelStyle: TextStyle(
-                                      color: Color(0xff385a92),
-                                    ),
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12.0),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12.0),
-                                      borderSide: BorderSide(
-                                        color: Color(0xff385a92),
-                                        width: 2.0,
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: InternationalPhoneNumberInput(
+                                        onInputChanged: (PhoneNumber? number) {
+                                          setState(() {
+                                            _alternativeNumber =
+                                                number?.phoneNumber ?? '';
+                                            _selected3CountryCode =
+                                                number?.isoCode ?? 'US';
+                                          });
+                                        },
+                                        selectorConfig: SelectorConfig(
+                                          selectorType:
+                                              PhoneInputSelectorType.BOTTOM_SHEET,
+                                        ),
+                                        autoValidateMode:
+                                            AutovalidateMode.onUserInteraction,
+                                        inputDecoration: InputDecoration(
+                                          labelText:
+                                              'Alternative Contact Number',
+                                          labelStyle: TextStyle(
+                                            color: Color(0xff385a92),
+                                          ),
+                                          filled: true,
+                                          fillColor: Colors.white,
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12.0),
+                                            borderSide: BorderSide.none,
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12.0),
+                                            borderSide: BorderSide(
+                                              color: Color(0xff385a92),
+                                              width: 2.0,
+                                            ),
+                                          ),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12.0),
+                                            borderSide: BorderSide(
+                                              color: Colors.grey.shade300,
+                                              width: 1.0,
+                                            ),
+                                          ),
+                                          contentPadding: EdgeInsets.symmetric(
+                                              vertical: 15.0, horizontal: 10.0),
+                                          floatingLabelBehavior:
+                                              FloatingLabelBehavior.auto,
+                                        ),
+                                        initialValue: PhoneNumber(
+                                            isoCode: _selected3CountryCode),
                                       ),
                                     ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12.0),
-                                      borderSide: BorderSide(
-                                        color: Colors.grey.shade300,
-                                        width: 1.0,
-                                      ),
+                                    IconButton(
+                                      icon: Icon(Icons.help_outline,
+                                          color: Color(0xff385a92)),
+                                      onPressed: () {
+                                        _showInfoDialog(
+                                            'Alternative Contact Number',
+                                            'You can provide any alternative contact number, if you do not have any you can either write phone number or WhatsApp contact number in place of alternative contact number.');
+                                      },
                                     ),
-                                    contentPadding: EdgeInsets.symmetric(
-                                        vertical: 15.0, horizontal: 10.0),
-                                    floatingLabelBehavior:
-                                        FloatingLabelBehavior.auto,
-                                  ),
-                                  initialValue: PhoneNumber(
-                                      isoCode: _selected3CountryCode),
+                                  ],
                                 ),
                                 SizedBox(height: 20.0),
-                                TextFormField(
-                                  controller: _institutionController,
-                                  decoration: InputDecoration(
-                                    labelText: 'Institution/Practice Name',
-                                    labelStyle:
-                                        TextStyle(color: Color(0xff385a92)),
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12.0),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12.0),
-                                      borderSide: BorderSide(
-                                        color: Color(0xff385a92),
-                                        width: 2.0,
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller: _institutionController,
+                                        decoration: InputDecoration(
+                                          labelText:
+                                              'Institution/Practice Name',
+                                          labelStyle:
+                                              TextStyle(color: Color(0xff385a92)),
+                                          filled: true,
+                                          fillColor: Colors.white,
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12.0),
+                                            borderSide: BorderSide.none,
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12.0),
+                                            borderSide: BorderSide(
+                                              color: Color(0xff385a92),
+                                              width: 2.0,
+                                            ),
+                                          ),
+                                          prefixIcon: Icon(Icons.school,
+                                              color: Color(0xff385a92)),
+                                        ),
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Please enter your institution';
+                                          }
+                                          return null;
+                                        },
                                       ),
                                     ),
-                                    prefixIcon: Icon(Icons.school,
-                                        color: Color(0xff385a92)),
-                                  ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter your institution';
-                                    }
-                                    return null;
-                                  },
+                                    IconButton(
+                                      icon: Icon(Icons.help_outline,
+                                          color: Color(0xff385a92)),
+                                      onPressed: () {
+                                        _showInfoDialog('Institution or Practice Name',
+                                            'It will help us identifying that all the information you have given is matching with your eligibility documents or not. If you shift your practice or institute, please update it in your profile edit section.');
+                                      },
+                                    ),
+                                  ],
                                 ),
                                 SizedBox(height: 20),
                                 GestureDetector(
@@ -881,6 +983,26 @@ class _DentalSignupState extends State<DentalSignup> {
             _selectedGraduationCountry = country.name;
           }
         });
+      },
+    );
+  }
+
+  void _showInfoDialog(String title, String content) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: <Widget>[
+            TextButton(
+              child: Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
       },
     );
   }
