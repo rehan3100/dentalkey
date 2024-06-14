@@ -29,8 +29,17 @@ import Flutter
         result(FlutterMethodNotImplemented)
       }
     }
-
-    let settingsChannel = FlutterMethodChannel(name: "com.dentalkeybyrehan.dentalkey/settings", binaryMessenger: controller.binaryMessenger)
+    let deviceIdChannel = FlutterMethodChannel(name: "com.dentalkeybyrehan.dentalkeynew/device_id", binaryMessenger: controller.binaryMessenger)
+    deviceIdChannel.setMethodCallHandler { [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) in
+      guard let self = self else { return }
+      if call.method == "getSecureVendorIdentifier" {
+        let vendorId = self.getSecureVendorIdentifier()
+        result(vendorId)
+      } else {
+        result(FlutterMethodNotImplemented)
+      }
+    }
+/*    let settingsChannel = FlutterMethodChannel(name: "com.dentalkeybyrehan.dentalkey/settings", binaryMessenger: controller.binaryMessenger)
     settingsChannel.setMethodCallHandler { [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) in
       guard let self = self else { return }
       if call.method == "openSettings" {
@@ -44,7 +53,7 @@ import Flutter
         result(FlutterMethodNotImplemented)
       }
     }
-    
+*/    
     self.addSecureView()
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
@@ -91,5 +100,41 @@ import Flutter
         }
       }
     }
+  }
+
+  private func getSecureVendorIdentifier() -> String {
+    let key = "com.dentalkeybyrehan.secureVendorIdentifier"
+    if let vendorIdentifier = readKeychainValue(forKey: key) {
+      return vendorIdentifier
+    } else {
+      let newVendorIdentifier = UIDevice.current.identifierForVendor!.uuidString
+      saveKeychainValue(newVendorIdentifier, forKey: key)
+      return newVendorIdentifier
+    }
+  }
+
+  private func saveKeychainValue(_ value: String, forKey key: String) {
+    let data = value.data(using: .utf8)!
+    let query: [String: Any] = [
+      kSecClass as String: kSecClassGenericPassword,
+      kSecAttrAccount as String: key,
+      kSecValueData as String: data
+    ]
+    SecItemAdd(query as CFDictionary, nil)
+  }
+
+  private func readKeychainValue(forKey key: String) -> String? {
+    let query: [String: Any] = [
+      kSecClass as String: kSecClassGenericPassword,
+      kSecAttrAccount as String: key,
+      kSecReturnData as String: kCFBooleanTrue!,
+      kSecMatchLimit as String: kSecMatchLimitOne
+    ]
+    var result: AnyObject?
+    SecItemCopyMatching(query as CFDictionary, &result)
+    if let data = result as? Data {
+      return String(data: data, encoding: .utf8)
+    }
+    return nil
   }
 }

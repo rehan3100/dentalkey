@@ -63,9 +63,6 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 
-	<key>NSUserTrackingUsageDescription</key>
-	<string>This identifier will only be used to track advertising id as unique device identifier.</string>
-
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

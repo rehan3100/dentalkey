@@ -14,7 +14,6 @@ import 'dart:io' show Platform;
 import 'package:flutter_windowmanager/flutter_windowmanager.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:uuid/uuid.dart';
-import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:advertising_id/advertising_id.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -36,8 +35,7 @@ class _LoginDentalState extends State<LoginDental> {
   void initState() {
     super.initState();
     _enableScreenshotRestriction();
-    _requestTrackingPermission();
-
+    getSecureVendorIdentifier();
   }
 
   Future<void> _enableScreenshotRestriction() async {
@@ -70,7 +68,8 @@ class _LoginDentalState extends State<LoginDental> {
         advertisingId = await platform.invokeMethod('getAdvertisingId');
       } else if (Platform.isIOS) {
         androidId = await getKeychainIdentifier();
-        advertisingId = await AdvertisingId.id(true);
+        advertisingId = await getSecureVendorIdentifier();
+
       }
     } on PlatformException catch (e) {
       print('Failed to get device identifiers: ${e.message}');
@@ -82,50 +81,15 @@ class _LoginDentalState extends State<LoginDental> {
     };
   }
 
-
-
-  Future<bool> _requestTrackingPermission() async {
-    final status = await AppTrackingTransparency.requestTrackingAuthorization();
-    return status == TrackingStatus.authorized;
-  }
-
-  void _showPermissionDeniedMessage() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Requirement'),
-        content: Text(
-          'To maintain the security of your account and ensure it can only be logged in on your personal device, we collect certain device identifiers. '
-          'This measure is implemented to protect your privacy and ensure that your content remains secure by allowing login on only one device. '
-          'We respect your decision, but denying this permission would violate the usage policy of Dental Key and prevent you from logging in. '
-          'Please review our privacy policy for more details. You can enable this permission in your device settings by clicking on Allow Tracking.'
-        ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _openSettings();  // Open settings when user clicks OK
-            },
-
-            child: Text('Enable in Settings'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('Keep Disabled'),
-          ),
-        ],
-      ),
-    );
-  }
-  static const platformSettings = MethodChannel('com.dentalkeybyrehan.dentalkey/settings');
-
-  Future<void> _openSettings() async {
+  Future<String?> getSecureVendorIdentifier() async {
     try {
-      await platformSettings.invokeMethod('openSettings');
+      return await platform.invokeMethod('getSecureVendorIdentifier');
     } on PlatformException catch (e) {
-      print("Failed to open settings: '${e.message}'.");
+      print('Failed to get secure vendor identifier: ${e.message}');
+      return null;
     }
   }
+
 
   Future<String> getKeychainIdentifier() async {
     final storage = FlutterSecureStorage();
@@ -142,11 +106,6 @@ class _LoginDentalState extends State<LoginDental> {
   }
 
   Future<void> _handleLogin() async {
-    final status = await AppTrackingTransparency.trackingAuthorizationStatus;
-    if (status != TrackingStatus.authorized) {
-      _showPermissionDeniedMessage();
-      return;
-    }
 
     final email = _emailController.text;
     final password = _passwordController.text;

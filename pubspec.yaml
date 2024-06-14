@@ -56,7 +56,6 @@ dependencies:
   flutter_secure_storage: ^9.2.2
   mailto: ^2.0.0
   logging: ^1.0.2
-  app_tracking_transparency: ^2.0.1
   advertising_id: ^2.6.0
 
 dev_dependencies:
