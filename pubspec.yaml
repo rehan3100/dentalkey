@@ -77,6 +77,10 @@ flutter:
     - assets/images/patientportalclicked.png
     - assets/images/patientportalpatientclicked.png
     - assets/images/dentalportaldoctorclicked.png
+    - assets/images/dentalportal_clicked.png
+    - assets/images/patientportal_clicked.png
+    - assets/images/dentalportal_unclicked.png
+    - assets/images/patientportal_unclicked.png
     - assets/images/avatar_man.png
     - assets/images/avatar_woman.png
     - assets/images/avatar_default.png

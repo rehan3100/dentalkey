@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'splash_screen.dart';
 import 'package:dental_key/dental_portal/authentication/login_dental.dart';
-import 'splash_screen.dart'; // Import your SplashScreen
 
 class MainScreen extends StatefulWidget {
   @override
@@ -8,19 +8,16 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  // Booleans to track whether each image is clicked
   bool isDentistPortalClicked = false;
   bool isDentalDoctorClicked = false;
   bool isPatientPortalClicked = false;
   bool isPatientPatientClicked = false;
 
-  // Function to handle click events for group 1
   void handleGroup1Click() {
     setState(() {
       isDentistPortalClicked = !isDentistPortalClicked;
       if (isDentistPortalClicked) {
         isDentalDoctorClicked = true;
-        // Deactivate group 2
         isPatientPortalClicked = false;
         isPatientPatientClicked = false;
       } else {
@@ -29,13 +26,11 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-  // Function to handle click events for group 2
   void handleGroup2Click() {
     setState(() {
       isPatientPortalClicked = !isPatientPortalClicked;
       if (isPatientPortalClicked) {
         isPatientPatientClicked = true;
-        // Deactivate group 1
         isDentistPortalClicked = false;
         isDentalDoctorClicked = false;
       } else {
@@ -45,7 +40,6 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Future<bool> _onWillPop() async {
-    // Navigate to SplashScreen on back press
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => SplashScreen()),
@@ -55,9 +49,6 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    double fem = MediaQuery.of(context).size.width / 429;
-    double ffem = fem * 0.97;
-
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
@@ -66,17 +57,17 @@ class _MainScreenState extends State<MainScreen> {
             width: double.infinity,
             child: Padding(
               padding: EdgeInsets.fromLTRB(
-                  13.94 * fem, // left padding
-                  100 * fem, // top padding
-                  13.94 * fem, // right padding
-                  20 * fem), // bottom padding (adjust as needed)
+                  14.0, // left padding
+                  100.0, // top padding
+                  14.0, // right padding
+                  20.0), // bottom padding (adjust as needed)
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
-                    margin: EdgeInsets.only(bottom: 52 * fem),
-                    width: 220.51 * fem,
-                    height: 200 * fem,
+                    margin: EdgeInsets.only(bottom: 52.0),
+                    width: 220.0,
+                    height: 200.0,
                     child: Image.asset(
                       'assets/logo.png',
                       fit: BoxFit.cover,
@@ -87,82 +78,48 @@ class _MainScreenState extends State<MainScreen> {
                     style: TextStyle(
                       color: Color(0xff000000),
                       fontFamily: 'Inter',
-                      fontSize: 16 * ffem,
+                      fontSize: 16.0,
                       fontWeight: FontWeight.bold,
-                      height: 3.0 * ffem / fem,
-                      letterSpacing: -0.24 * fem,
+                      height: 3.0,
+                      letterSpacing: -0.24,
                     ),
                   ),
-                  SizedBox(height: 30 * fem),
-                  Container(
-                    width: double.infinity,
-                    height: 300 * fem, // Adjust height as needed
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          left: 70 *
-                              fem, // Adjust left position of the first image
-                          top: 0,
-                          child: GestureDetector(
-                            onTap: handleGroup1Click,
+                  SizedBox(height: 10.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: handleGroup1Click,
+                          child: AspectRatio(
+                            aspectRatio:
+                                1.0, // Adjust this ratio as needed to maintain the desired height
                             child: Image.asset(
                               isDentistPortalClicked
-                                  ? 'assets/images/dentalportalclicked.png'
-                                  : 'assets/images/dentists_portal_unclicked.png',
-                              width: 150 * fem, // Adjust width as needed
-                              height: 150 * fem, // Adjust height as needed
+                                  ? 'assets/images/dentalportal_clicked.png'
+                                  : 'assets/images/dentalportal_unclicked.png',
+                              fit: BoxFit.contain,
                             ),
                           ),
                         ),
-                        Positioned(
-                          left: -20 *
-                              fem, // Adjust left position of the second image
-                          top: 20,
-                          child: GestureDetector(
-                            onTap: handleGroup1Click,
-                            child: Image.asset(
-                              isDentalDoctorClicked
-                                  ? 'assets/images/dentalportaldoctorclicked.png'
-                                  : 'assets/images/dentalportaldoctor.png',
-                              width: 150 * fem, // Adjust width as needed
-                              height: 200 * fem, // Adjust height as needed
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          left: 200 *
-                              fem, // Adjust left position of the third image
-                          top: 0,
-                          child: GestureDetector(
-                            onTap: handleGroup2Click,
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: handleGroup2Click,
+                          child: AspectRatio(
+                            aspectRatio:
+                                1.0, // Adjust this ratio as needed to maintain the desired height
                             child: Image.asset(
                               isPatientPortalClicked
-                                  ? 'assets/images/patientportalclicked.png'
-                                  : 'assets/images/patient_portal.png',
-                              width: 150 * fem, // Adjust width as needed
-                              height: 150 * fem, // Adjust height as needed
+                                  ? 'assets/images/patientportal_clicked.png'
+                                  : 'assets/images/patientportal_unclicked.png',
+                              fit: BoxFit.contain,
                             ),
                           ),
                         ),
-                        Positioned(
-                          left: 280 *
-                              fem, // Adjust left position of the fourth image
-                          top: 20,
-                          child: GestureDetector(
-                            onTap: handleGroup2Click,
-                            child: Image.asset(
-                              isPatientPatientClicked
-                                  ? 'assets/images/patientportalpatientclicked.png'
-                                  : 'assets/images/patientportalpatient.png',
-                              width: 150 * fem, // Adjust width as needed
-                              height: 200 * fem, // Adjust height as needed
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-    
                 ],
               ),
             ),
@@ -187,12 +144,9 @@ class _MainScreenState extends State<MainScreen> {
                     child: Text('Continue to Login'),
                   ),
                 if (isPatientPortalClicked && isPatientPatientClicked)
-                  ElevatedButton(
-                    onPressed: null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey,
-                    ),
-                    child: Text('Not available for now'),
+                  Expanded(
+                    child: Text(
+                        'Right now, we are not accepting Patient Portal registrations. If you are a dentist or dental student you can register in Dentists Portal'),
                   ),
               ],
             ),

@@ -5,93 +5,66 @@ import 'package:flutter/services.dart'; // Import services to use SystemNavigato
 class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // Calculate the factor for responsiveness
-    final double fem = MediaQuery.of(context).size.width / 429;
-
-    // Define colors
-    final Color whiteColor = Colors.white;
-    final Color blackColor = Color.fromRGBO(0, 0, 0, 1);
-
     return WillPopScope(
       onWillPop: () async {
-        // Exit the app when back button is pressed
         SystemNavigator.pop();
-        return Future.value(false); // Return false to prevent further handling
+        return Future.value(false);
       },
       child: Scaffold(
-        backgroundColor: whiteColor,
+        backgroundColor: Colors.white,
         body: Center(
-          child: SingleChildScrollView(
-            // Wrap Column with SingleChildScrollView
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Logo
-                Container(
-                  margin: EdgeInsets.only(
-                      bottom: 40 *
-                          fem), // Increase bottom margin to bring texts closer
-                  width: 300 * fem, // Decrease width of logo
-                  height: 600 * fem, // Maintain height
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('assets/logo.png'),
-                      fit: BoxFit.fitWidth,
-                    ),
-                  ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 50.0),
+                child: Center(
+                  child: Image.asset('assets/logo.png'),
                 ),
-                // Text "founded by"
-                Text(
-                  'founded by',
-                  style: TextStyle(
-                    color: blackColor,
-                    fontFamily: 'Inter',
-                    fontSize: 18 * fem,
-                    fontWeight: FontWeight.normal,
-                  ),
+              ),
+              SizedBox(height: 30),
+              Text(
+                'founded by',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontFamily: 'Inter',
+                  fontSize: 16,
                 ),
-                SizedBox(height: 10 * fem), // Add space between lines of text
-                // Text "DR. MUHAMMAD REHAN" (bold)
-                Text(
-                  'DR. MUHAMMAD REHAN',
-                  style: TextStyle(
-                    color: blackColor,
-                    fontFamily: 'Inter',
-                    fontSize: 20 * fem,
-                    fontWeight: FontWeight.bold, // Make text bold
-                  ),
+              ),
+              SizedBox(height: 10),
+              Text(
+                'DR. MUHAMMAD REHAN',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontFamily: 'Inter',
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
-                // Spacer(), // Remove Spacer
-                SizedBox(height: 20 * fem), // Add space before button
-                // Button
-                Container(
-                  margin: EdgeInsets.only(
-                      bottom: 40 *
-                          fem), // Decrease bottom margin to align button closer to the bottom
-                  width: 380 * fem, // Decrease width of button
-                  height: 55 * fem,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                MainScreen()), // Navigate to mainscreen widget
-                      );
-                    },
-                    child: Center(
-                      child: Text(
-                        'GET STARTED',
-                        style: TextStyle(
-                          fontSize: 16 * fem,
-                        ),
+              ),
+              SizedBox(height: 50),
+              Container(
+                margin: EdgeInsets.only(bottom: 20),
+                width: 250,
+                height: 55,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => MainScreen()),
+                    );
+                  },
+                  child: Center(
+                    child: Text(
+                      'GET STARTED',
+                      style: TextStyle(
+                        fontSize: 16,
                       ),
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

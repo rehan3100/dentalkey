@@ -29,6 +29,21 @@ import Flutter
         result(FlutterMethodNotImplemented)
       }
     }
+
+    let settingsChannel = FlutterMethodChannel(name: "com.dentalkeybyrehan.dentalkey/settings", binaryMessenger: controller.binaryMessenger)
+    settingsChannel.setMethodCallHandler { [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) in
+      guard let self = self else { return }
+      if call.method == "openSettings" {
+        if let appSettings = URL(string: UIApplication.openSettingsURLString) {
+          UIApplication.shared.open(appSettings, options: [:], completionHandler: nil)
+          result(true)
+        } else {
+          result(FlutterError(code: "UNAVAILABLE", message: "Cannot open settings", details: nil))
+        }
+      } else {
+        result(FlutterMethodNotImplemented)
+      }
+    }
     
     self.addSecureView()
 

@@ -16,6 +16,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:uuid/uuid.dart';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:advertising_id/advertising_id.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginDental extends StatefulWidget {
   @override
@@ -34,29 +35,26 @@ class _LoginDentalState extends State<LoginDental> {
   @override
   void initState() {
     super.initState();
-    _enableScreenshotRestriction(); // Add this line
+    _enableScreenshotRestriction();
+    _requestTrackingPermission();
+
   }
 
   Future<void> _enableScreenshotRestriction() async {
     if (Platform.isAndroid) {
       await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
-    // } else if (Platform.isIOS) {
-    //   await screenshotplatform.invokeMethod('enableScreenshotRestriction');
     }
   }
 
   @override
   void dispose() {
-    _disableScreenshotRestriction(); // Add this line
-
+    _disableScreenshotRestriction();
     super.dispose();
   }
 
   Future<void> _disableScreenshotRestriction() async {
     if (Platform.isAndroid) {
       await FlutterWindowManager.clearFlags(FlutterWindowManager.FLAG_SECURE);
-    // } else if (Platform.isIOS) {
-    //   await screenshotplatform.invokeMethod('disableScreenshotRestriction');
     }
   }
 
@@ -84,24 +82,58 @@ class _LoginDentalState extends State<LoginDental> {
     };
   }
 
-  Future<bool> requestTrackingPermission() async {
+
+
+  Future<bool> _requestTrackingPermission() async {
     final status = await AppTrackingTransparency.requestTrackingAuthorization();
-    if (status != TrackingStatus.authorized) {
-      print('Tracking permission denied');
-      return false;
-    }
-    return true;
+    return status == TrackingStatus.authorized;
   }
 
-  final storage = FlutterSecureStorage();
-  final uuid = Uuid();
+  void _showPermissionDeniedMessage() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Requirement'),
+        content: Text(
+          'To maintain the security of your account and ensure it can only be logged in on your personal device, we collect certain device identifiers. '
+          'This measure is implemented to protect your privacy and ensure that your content remains secure by allowing login on only one device. '
+          'We respect your decision, but denying this permission would violate the usage policy of Dental Key and prevent you from logging in. '
+          'Please review our privacy policy for more details. You can enable this permission in your device settings by clicking on Allow Tracking.'
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _openSettings();  // Open settings when user clicks OK
+            },
+
+            child: Text('Enable in Settings'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Keep Disabled'),
+          ),
+        ],
+      ),
+    );
+  }
+  static const platformSettings = MethodChannel('com.dentalkeybyrehan.dentalkey/settings');
+
+  Future<void> _openSettings() async {
+    try {
+      await platformSettings.invokeMethod('openSettings');
+    } on PlatformException catch (e) {
+      print("Failed to open settings: '${e.message}'.");
+    }
+  }
 
   Future<String> getKeychainIdentifier() async {
-    // Check if the identifier already exists in the keychain
+    final storage = FlutterSecureStorage();
+    final uuid = Uuid();
+
     String? deviceIdentifier = await storage.read(key: 'device_identifier');
     
     if (deviceIdentifier == null) {
-      // If not, generate a new UUID and store it in the keychain
       deviceIdentifier = uuid.v4();
       await storage.write(key: 'device_identifier', value: deviceIdentifier);
     }
@@ -110,40 +142,21 @@ class _LoginDentalState extends State<LoginDental> {
   }
 
   Future<void> _handleLogin() async {
-    String email = _emailController.text;
-    String password = _passwordController.text;
+    final status = await AppTrackingTransparency.trackingAuthorizationStatus;
+    if (status != TrackingStatus.authorized) {
+      _showPermissionDeniedMessage();
+      return;
+    }
+
+    final email = _emailController.text;
+    final password = _passwordController.text;
+
 
     setState(() {
       _isLoading = true;
     });
 
     try {
-      // Request tracking permission for iOS
-      if (Platform.isIOS) {
-        bool permissionGranted = await requestTrackingPermission();
-        if (!permissionGranted) {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: Text('Permission Required'),
-              content: Text('Tracking permission is required to use this app. Please enable it in settings.'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('OK'),
-                ),
-              ],
-            ),
-          );
-          setState(() {
-            _isLoading = false;
-          });
-          return; // Exit the method if permission is not granted
-        }
-      }
-
       Map<String, String?> deviceIdentifiers = await _getDeviceIdentifiers();
       String? deviceIdentifier = deviceIdentifiers['androidId'];
       String? advertisingId = deviceIdentifiers['advertisingId'];
@@ -169,12 +182,10 @@ class _LoginDentalState extends State<LoginDental> {
         String accessToken = responseData['access'];
         String refreshToken = responseData['refresh'];
 
-        // Store the tokens securely using shared_preferences
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('accessToken', accessToken);
         await prefs.setString('refreshToken', refreshToken);
 
-        // Navigate to the next screen
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -229,7 +240,7 @@ class _LoginDentalState extends State<LoginDental> {
       });
     }
   }
-
+  
   Future<void> refreshAccessToken() async {
     final prefs = await SharedPreferences.getInstance();
     String? refreshToken = prefs.getString('refreshToken');
@@ -266,271 +277,213 @@ class _LoginDentalState extends State<LoginDental> {
     return false;
   }
 
+  void _launchPrivacyPolicy() async {
+    const url = 'https://www.freeprivacypolicy.com/live/3f3fd527-1911-4727-b224-cbe260917b59';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double fem = 1.0; // Placeholder value for fem
     double ffem = 1.0; // Placeholder value for ffem
+
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Container(
-                  padding:
-                      EdgeInsets.fromLTRB(0 * fem, 6 * fem, 0 * fem, 0 * fem),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Color(0xff5a5a5a)),
+        appBar: AppBar(
+          title: Text('Dentist Portal'),
+          backgroundColor: Color(0xff385a92),
+        ),
+        body: SingleChildScrollView(
+          padding: EdgeInsets.all(20.0 * fem),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'LOGIN',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 30 * ffem,
+                    fontWeight: FontWeight.w600,
+                    height: 1.2125 * ffem / fem,
+                    letterSpacing: -0.45 * fem,
                     color: Color(0xff385a92),
-                    borderRadius: BorderRadius.circular(45 * fem),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        color: Color(0xff385a92),
-                        width: double.infinity,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              margin: EdgeInsets.fromLTRB(
-                                  0 * fem, 20 * fem, 0 * fem, 5),
-                              width: 150 * fem,
-                              height: 200 * fem,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(15 * fem),
-                                child: Image.asset(
-                                  'assets/images/dentalportalclicked.png',
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        margin:
-                            EdgeInsets.fromLTRB(0 * fem, 0 * fem, 0 * fem, 0),
-                        color: Color.fromARGB(255, 255, 255, 255),
-                        width: double.infinity,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Container(
-                              margin: EdgeInsets.fromLTRB(
-                                  0 * fem, 20 * fem, 0 * fem, 0 * fem),
-                              child: Text(
-                                'LOGIN',
-                                style: TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontSize: 30 * ffem,
-                                  fontWeight: FontWeight.w600,
-                                  height: 1.2125 * ffem / fem,
-                                  letterSpacing: -0.45 * fem,
-                                  color: Color(0xff385a92),
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.fromLTRB(
-                                  20 * fem, 0 * fem, 20 * fem, 20 * fem),
-                              width: double.infinity,
-                              child: Column(
-                                children: [
-                                  SizedBox(height: 20.0),
-                                  TextFormField(
-                                    controller: _emailController,
-                                    decoration: InputDecoration(
-                                      labelText: 'Email Address',
-                                      labelStyle:
-                                          TextStyle(color: Color(0xff385a92)),
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide.none,
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                          color: Color(0xff385a92),
-                                          width: 2.0,
-                                        ),
-                                      ),
-                                      prefixIcon: Icon(Icons.email,
-                                          color: Color(0xff385a92)),
-                                    ),
-                                    keyboardType: TextInputType.emailAddress,
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Please enter your email address';
-                                      } else if (!RegExp(
-                                              r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                          .hasMatch(value)) {
-                                        return 'Please enter a valid email address';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                  SizedBox(height: 16.0),
-                                  TextFormField(
-                                    controller: _passwordController,
-                                    decoration: InputDecoration(
-                                      labelText: 'Password',
-                                      labelStyle:
-                                          TextStyle(color: Color(0xff385a92)),
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide.none,
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                          color: Color(0xff385a92),
-                                          width: 2.0,
-                                        ),
-                                      ),
-                                      prefixIcon: Icon(Icons.lock,
-                                          color: Color(0xff385a92)),
-                                      suffixIcon: IconButton(
-                                        icon: Icon(
-                                          _passwordVisible
-                                              ? Icons.visibility
-                                              : Icons.visibility_off,
-                                          color: Color(0xff385a92),
-                                        ),
-                                        onPressed: () {
-                                          setState(() {
-                                            _passwordVisible =
-                                                !_passwordVisible;
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                    obscureText: !_passwordVisible,
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Please enter your password';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                  SizedBox(height: 40.0),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      MouseRegion(
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      DentalSignup()),
-                                            );
-                                          },
-                                          child: Text(
-                                            'No Account? Signup Now',
-                                            style: TextStyle(
-                                              color: Color(0xFF385A92),
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      MouseRegion(
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      DentalPasswordForgot()),
-                                            );
-                                          },
-                                          child: Text(
-                                            'Forgotten Password?',
-                                            style: TextStyle(
-                                              color: Color(0xFF385A92),
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
                   ),
                 ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(16.0 * fem),
-              child: Column(
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _handleLogin,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          const Text(
-                            'Login Now',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          if (_isLoading)
-                            const CircularProgressIndicator(
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                        ],
+                SizedBox(height: 20.0),
+                TextFormField(
+                  controller: _emailController,
+                  decoration: InputDecoration(
+                    labelText: 'Email Address',
+                    labelStyle: TextStyle(color: Color(0xff385a92)),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                      borderSide: BorderSide(
+                        color: Color(0xff385a92),
+                        width: 2.0,
                       ),
                     ),
+                    prefixIcon: Icon(Icons.email, color: Color(0xff385a92)),
                   ),
-                  SizedBox(height: 16.0),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your email address';
+                    } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                        .hasMatch(value)) {
+                      return 'Please enter a valid email address';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 10.0),
+                TextFormField(
+                  controller: _passwordController,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    labelStyle: TextStyle(color: Color(0xff385a92)),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                      borderSide: BorderSide(
+                        color: Color(0xff385a92),
+                        width: 2.0,
+                      ),
+                    ),
+                    prefixIcon: Icon(Icons.lock, color: Color(0xff385a92)),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _passwordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                        color: Color(0xff385a92),
+                      ),
                       onPressed: () {
-                        Navigator.of(context).pop(); // Close the dialog
+                        setState(() {
+                          _passwordVisible = !_passwordVisible;
+                        });
+                      },
+                    ),
+                  ),
+                  obscureText: !_passwordVisible,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your password';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 20.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => DentalDeviceChange()),
+                              builder: (context) => DentalSignup()),
                         );
                       },
-                      child: const Text(
-                        'Request Change In Device',
+                      child: Text(
+                        'No Account? Signup Now',
                         style: TextStyle(
+                          color: Color(0xFF385A92),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => DentalPasswordForgot()),
+                        );
+                      },
+                      child: Text(
+                        'Forgotten Password?',
+                        style: TextStyle(
+                          color: Color(0xFF385A92),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20.0),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _handleLogin,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        const Text(
+                          'Login Now',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        if (_isLoading)
+                          const CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
+                ),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the dialog
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => DentalDeviceChange()),
+                      );
+                    },
+                    child: const Text(
+                      'Request Change In Device',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20.0), // Add some space before the new section
+                GestureDetector(
+                  onTap: _launchPrivacyPolicy,
+                  child: Text(
+                    'Privacy Policy',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
